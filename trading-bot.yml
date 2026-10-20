@@ -1,0 +1,23 @@
+name: Trading bot
+
+on:
+  schedule:
+    # Every 30 min, 13:00-20:30 UTC on weekdays. That covers US market hours
+    # in both summer and winter time; runs while the market is closed just skip.
+    - cron: "*/30 13-20 * * 1-5"
+  workflow_dispatch: {}  # lets you run it manually from the Actions tab
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python daily_check.py
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
